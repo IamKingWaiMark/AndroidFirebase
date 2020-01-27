@@ -2,11 +2,8 @@ package com.kwm.android.firebase.service;
 
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnCanceledListener;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,7 +19,7 @@ public class AndroidFireAuth {
                         new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult authResult) {
-                                signInStatusListener.onSuccess((authResult));
+                                signInStatusListener.onSuccess(new Result(authResult));
                             }
                         }
                 ).addOnFailureListener(
@@ -42,7 +39,7 @@ public class AndroidFireAuth {
                         new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult authResult) {
-                                signInStatusListener.onSuccess((authResult));
+                                signInStatusListener.onSuccess(new Result(authResult));
                             }
                         }
                 ).addOnFailureListener(
@@ -66,10 +63,11 @@ public class AndroidFireAuth {
                 new FirebaseAuth.AuthStateListener() {
                     @Override
                     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                        User user = new User(firebaseUser);
                         if(user != null) {
                             authState.whenLoggedIn(user);
-                            if(user.isEmailVerified()) {
+                            if(user.user.isEmailVerified()) {
                                 authState.whenLoggedInAndEmailVerified(user);
                             } else {
                                 authState.whenLoggedInAndEmailNotVerified(user);
@@ -120,7 +118,7 @@ public class AndroidFireAuth {
                 new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        authStatusListener.onSuccess(authResult);
+                        authStatusListener.onSuccess(new Result(authResult));
                     }
                 }
         ).addOnFailureListener(
@@ -148,15 +146,29 @@ public class AndroidFireAuth {
         return getAuth().getCurrentUser();
     }
     public interface AuthStatusListener {
-        void onSuccess(AuthResult authResult);
+        void onSuccess(Result result);
         void onFailure(String errorMessage);
     }
     public interface AuthState {
-        void whenChanged(FirebaseUser user);
-        void whenLoggedIn(FirebaseUser user);
+        void whenChanged(User user);
+        void whenLoggedIn(User user);
         void whenLoggedOut();
-        void whenLoggedInAndEmailNotVerified(FirebaseUser user);
-        void whenLoggedInAndEmailVerified(FirebaseUser user);
+        void whenLoggedInAndEmailNotVerified(User user);
+        void whenLoggedInAndEmailVerified(User user);
+    }
+
+    public class User {
+        FirebaseUser user;
+        User(FirebaseUser user) {
+            this.user = user;
+        }
+    }
+
+    public class Result {
+        AuthResult authResult;
+        Result(AuthResult authResult) {
+            this.authResult = authResult;
+        }
     }
 }
 
