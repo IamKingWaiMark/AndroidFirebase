@@ -162,12 +162,19 @@ public class AndroidFireAuth {
         User(FirebaseUser user) {
             this.user = user;
         }
+        public FirebaseUser get(){
+            return this.user;
+        }
     }
 
     public class Result {
         AuthResult authResult;
         Result(AuthResult authResult) {
             this.authResult = authResult;
+        }
+
+        public AuthResult get(){
+            return this.authResult;
         }
     }
 }
