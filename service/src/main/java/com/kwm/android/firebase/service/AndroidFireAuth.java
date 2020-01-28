@@ -1,5 +1,6 @@
 package com.kwm.android.firebase.service;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -7,6 +8,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 
@@ -157,24 +160,56 @@ public class AndroidFireAuth {
         void whenLoggedInAndEmailVerified(User user);
     }
 
-    public class User {
+    public class User{
         FirebaseUser user;
         User(FirebaseUser user) {
             this.user = user;
         }
-        public FirebaseUser get(){
-            return this.user;
+        public String getUid(){
+            return user.getUid();
         }
+        public String getDisplayName(){
+            return this.user.getDisplayName();
+        }
+        public String getEmail() {
+            return user.getEmail();
+        }
+
+        public String getPhoneNumber(){
+            return user.getPhoneNumber();
+        }
+
+        public Uri getPhotoUri(){
+            return user.getPhotoUrl();
+        }
+
+        public String getProviderId(){
+            return user.getProviderId();
+        }
+
     }
 
     public class Result {
         AuthResult authResult;
+        User user;
         Result(AuthResult authResult) {
             this.authResult = authResult;
+            this.user = new User(authResult.getUser());
         }
 
-        public AuthResult get(){
-            return this.authResult;
+        public User getUser(){
+            return this.user;
+        }
+
+        public String getUsername(){
+            return this.authResult.getAdditionalUserInfo().getUsername();
+        }
+
+        public boolean isNewUser(){
+            return this.authResult.getAdditionalUserInfo().isNewUser();
+        }
+        public Map<String, Object> getProfile(){
+            return this.authResult.getAdditionalUserInfo().getProfile();
         }
     }
 }
