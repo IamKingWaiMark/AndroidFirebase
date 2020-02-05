@@ -69,12 +69,14 @@ public class AndroidFireAuth {
                         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                         User user = new User(firebaseUser);
                         if(user != null) {
-                            authState.whenLoggedIn(user);
-                            if(user.user.isEmailVerified()) {
-                                authState.whenLoggedInAndEmailVerified(user);
-                            } else {
-                                authState.whenLoggedInAndEmailNotVerified(user);
-                            }
+                            try{
+                                authState.whenLoggedIn(user);
+                                if(user.user.isEmailVerified()) {
+                                    authState.whenLoggedInAndEmailVerified(user);
+                                } else {
+                                    authState.whenLoggedInAndEmailNotVerified(user);
+                                }
+                            } catch (Exception err) {}
                         } else if (user == null) {
                             authState.whenLoggedOut();
                         } else {
@@ -174,15 +176,12 @@ public class AndroidFireAuth {
         public String getEmail() {
             return user.getEmail();
         }
-
         public String getPhoneNumber(){
             return user.getPhoneNumber();
         }
-
         public Uri getPhotoUri(){
             return user.getPhotoUrl();
         }
-
         public String getProviderId(){
             return user.getProviderId();
         }
@@ -200,11 +199,9 @@ public class AndroidFireAuth {
         public User getUser(){
             return this.user;
         }
-
         public String getUsername(){
             return this.authResult.getAdditionalUserInfo().getUsername();
         }
-
         public boolean isNewUser(){
             return this.authResult.getAdditionalUserInfo().isNewUser();
         }
