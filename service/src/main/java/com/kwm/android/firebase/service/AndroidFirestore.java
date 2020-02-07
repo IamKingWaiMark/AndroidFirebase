@@ -18,6 +18,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.kwm.android.firebase.service.interfaces.IGetCollectionResult;
+import com.kwm.android.firebase.service.interfaces.IGetDocumentResult;
+import com.kwm.android.firebase.service.interfaces.IListenerToCollection;
+import com.kwm.android.firebase.service.interfaces.IListenerToDocument;
 
 import androidx.annotation.NonNull;
 
@@ -313,20 +317,6 @@ public class AndroidFirestore {
     }
 
 
-    // INTERFACES
-    public interface IGetCollectionResult {
-        void result(Task<QuerySnapshot> task);
-    }
 
-    public interface IGetDocumentResult {
-        void result(Task<DocumentSnapshot> task);
-    }
-
-    public interface IListenerToCollection {
-        void onUpdate(QuerySnapshot queryDocumentSnapshots);
-    }
-    public interface IListenerToDocument {
-        void onUpdate(DocumentSnapshot documentSnapshot);
-    }
 
 }
