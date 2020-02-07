@@ -17,4 +17,7 @@ public class AndroidFirebaseApp {
     public static void init(Context context){
         FirebaseApp.initializeApp(context);
     }
+    public static FirebaseApp getInstance(){
+        return FirebaseApp.getInstance();
+    }
 }
