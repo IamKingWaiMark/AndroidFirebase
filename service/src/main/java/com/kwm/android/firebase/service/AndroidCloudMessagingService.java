@@ -9,6 +9,9 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import androidx.annotation.NonNull;
 
 public class AndroidCloudMessagingService extends FirebaseMessagingService {
+    public AndroidCloudMessagingService(){
+        super();
+    }
     /**
      * Subscribe to an topic to receive notification for a specific topic.
      * @param topic
