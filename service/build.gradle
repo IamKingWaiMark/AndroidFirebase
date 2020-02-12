@@ -33,6 +33,6 @@ dependencies {
     // Firebase Libs
     implementation 'com.google.firebase:firebase-auth:19.2.0'
     implementation 'com.google.firebase:firebase-firestore:21.4.0'
-
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
 
 }
