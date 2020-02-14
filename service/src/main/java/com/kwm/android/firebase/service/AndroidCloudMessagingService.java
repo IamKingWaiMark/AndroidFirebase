@@ -1,6 +1,8 @@
 package com.kwm.android.firebase.service;
 
 
+import android.util.Log;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -22,7 +24,8 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
     }
     /**
      * Subscribe to an topic to receive notification for a specific topic.
-     * @param topic
+     * @param topic Topic to subscribe to
+     * @param subscribeListener Use this to handle what happens when the attemp to subscribe succeeds or fail.
      */
     public static void subscribeTo(String topic, final SubscribeListener subscribeListener){
         FirebaseMessaging.getInstance().subscribeToTopic(topic).addOnSuccessListener(
@@ -59,15 +62,28 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
             } catch (Exception err) {}
         }
 
-        this.onMessageReceived.onReceived(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
+        try{
+            this.onMessageReceived.onReceived(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
+        } catch (Exception err) {
+            Log.e("AndroidCloudMessagingService", err.getMessage());
+        }
     }
+
+
     public void setOnMessageReceived(OnMessageReceived onMessageReceived) {
         this.onMessageReceived = onMessageReceived;
     }
 
+    /**
+     * Turns on auto notifications. When a new Firebase Cloud Message is sent, a notification will also be provoked.
+     */
     public void autoNotification(){
         this.autoNotification = true;
     }
+
+    /**
+     * Stops the auto notification process. By default, auto notification is turned off.
+     */
     public void stopAutoNotification(){
         this.autoNotification = false;
     }
