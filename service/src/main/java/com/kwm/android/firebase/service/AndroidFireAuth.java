@@ -22,7 +22,7 @@ public class AndroidFireAuth {
                         new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult authResult) {
-                                signInStatusListener.onSuccess(new Result(authResult));
+                                signInStatusListener.onSuccess(authResult);
                             }
                         }
                 ).addOnFailureListener(
@@ -42,7 +42,7 @@ public class AndroidFireAuth {
                         new OnSuccessListener<AuthResult>() {
                             @Override
                             public void onSuccess(AuthResult authResult) {
-                                signInStatusListener.onSuccess(new Result(authResult));
+                                signInStatusListener.onSuccess(authResult);
                             }
                         }
                 ).addOnFailureListener(
@@ -67,21 +67,20 @@ public class AndroidFireAuth {
                     @Override
                     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                        User user = new User(firebaseUser);
-                        if(user != null) {
+                        if(firebaseUser != null) {
                             try{
-                                authState.whenLoggedIn(user);
-                                if(user.user.isEmailVerified()) {
-                                    authState.whenLoggedInAndEmailVerified(user);
+                                authState.whenLoggedIn(firebaseUser);
+                                if(firebaseUser.isEmailVerified()) {
+                                    authState.whenLoggedInAndEmailVerified(firebaseUser);
                                 } else {
-                                    authState.whenLoggedInAndEmailNotVerified(user);
+                                    authState.whenLoggedInAndEmailNotVerified(firebaseUser);
                                 }
                             } catch (Exception err) {}
-                        } else if (user == null) {
+                        } else if (firebaseUser == null) {
                             authState.whenLoggedOut();
-                        } else {
-                            authState.whenChanged(user);
                         }
+
+                        authState.whenChanged(firebaseUser);
                     }
                 }
         );
@@ -123,7 +122,7 @@ public class AndroidFireAuth {
                 new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        authStatusListener.onSuccess(new Result(authResult));
+                        authStatusListener.onSuccess(authResult);
                     }
                 }
         ).addOnFailureListener(
@@ -151,64 +150,19 @@ public class AndroidFireAuth {
         return getAuth().getCurrentUser();
     }
     public interface AuthStatusListener {
-        void onSuccess(Result result);
+        void onSuccess(AuthResult result);
         void onFailure(String errorMessage);
     }
     public interface AuthState {
-        void whenChanged(User user);
-        void whenLoggedIn(User user);
+        void whenChanged(FirebaseUser user);
+        void whenLoggedIn(FirebaseUser user);
         void whenLoggedOut();
-        void whenLoggedInAndEmailNotVerified(User user);
-        void whenLoggedInAndEmailVerified(User user);
+        void whenLoggedInAndEmailNotVerified(FirebaseUser user);
+        void whenLoggedInAndEmailVerified(FirebaseUser user);
     }
 
-    public class User{
-        FirebaseUser user;
-        User(FirebaseUser user) {
-            this.user = user;
-        }
-        public String getUid(){
-            return user.getUid();
-        }
-        public String getDisplayName(){
-            return this.user.getDisplayName();
-        }
-        public String getEmail() {
-            return user.getEmail();
-        }
-        public String getPhoneNumber(){
-            return user.getPhoneNumber();
-        }
-        public Uri getPhotoUri(){
-            return user.getPhotoUrl();
-        }
-        public String getProviderId(){
-            return user.getProviderId();
-        }
 
-    }
 
-    public class Result {
-        AuthResult authResult;
-        User user;
-        Result(AuthResult authResult) {
-            this.authResult = authResult;
-            this.user = new User(authResult.getUser());
-        }
-
-        public User getUser(){
-            return this.user;
-        }
-        public String getUsername(){
-            return this.authResult.getAdditionalUserInfo().getUsername();
-        }
-        public boolean isNewUser(){
-            return this.authResult.getAdditionalUserInfo().isNewUser();
-        }
-        public Map<String, Object> getProfile(){
-            return this.authResult.getAdditionalUserInfo().getProfile();
-        }
-    }
 }
 
 
