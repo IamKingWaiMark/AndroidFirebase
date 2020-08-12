@@ -105,7 +105,7 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
     }
 
 
-    private void setIcon(int resId) {
+    public void setIcon(int resId) {
         icon = resId;
     }
 
