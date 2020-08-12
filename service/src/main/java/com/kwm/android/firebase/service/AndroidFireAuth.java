@@ -9,8 +9,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Map;
-
 import androidx.annotation.NonNull;
 
 public class AndroidFireAuth {
@@ -60,7 +58,7 @@ public class AndroidFireAuth {
         auth.signOut();
     }
 
-    public void listenToLoginStateChanges(final AuthState authState){
+    public void listenToSignInStateChanges(final AuthState authState){
         final FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.addAuthStateListener(
                 new FirebaseAuth.AuthStateListener() {
@@ -69,15 +67,15 @@ public class AndroidFireAuth {
                         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                         if(firebaseUser != null) {
                             try{
-                                authState.whenLoggedIn(firebaseUser);
+                                authState.whenSignedIn(firebaseUser);
                                 if(firebaseUser.isEmailVerified()) {
-                                    authState.whenLoggedInAndEmailVerified(firebaseUser);
+                                    authState.whenSignedInAndEmailVerified(firebaseUser);
                                 } else {
-                                    authState.whenLoggedInAndEmailNotVerified(firebaseUser);
+                                    authState.whenSignedInAndEmailNotVerified(firebaseUser);
                                 }
                             } catch (Exception err) {}
                         } else if (firebaseUser == null) {
-                            authState.whenLoggedOut();
+                            authState.whenSignedOut();
                         }
 
                         authState.whenChanged(firebaseUser);
@@ -155,10 +153,10 @@ public class AndroidFireAuth {
     }
     public interface AuthState {
         void whenChanged(FirebaseUser user);
-        void whenLoggedIn(FirebaseUser user);
-        void whenLoggedOut();
-        void whenLoggedInAndEmailNotVerified(FirebaseUser user);
-        void whenLoggedInAndEmailVerified(FirebaseUser user);
+        void whenSignedIn(FirebaseUser user);
+        void whenSignedOut();
+        void whenSignedInAndEmailNotVerified(FirebaseUser user);
+        void whenSignedInAndEmailVerified(FirebaseUser user);
     }
 
 
