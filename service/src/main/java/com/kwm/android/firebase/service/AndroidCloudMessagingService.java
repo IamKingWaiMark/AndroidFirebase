@@ -1,8 +1,10 @@
 package com.kwm.android.firebase.service;
 
 
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 
@@ -22,6 +24,7 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
     private boolean autoNotification = false;
     private OnMessageReceived onMessageReceived;
     private int notificationId = 0;
+    private int icon = 0;
 
     public AndroidCloudMessagingService(){
         super();
@@ -47,6 +50,7 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
                     }
                 }
         );
+
     }
 
     @Override
@@ -59,7 +63,7 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
         try{
             this.onMessageReceived.onReceived(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
         } catch (Exception err) {
-            Log.e("AndroidCloudMessagingService", err.getMessage());
+            Log.e("AndroidCloudMsg", err.getMessage());
         }
     }
 
@@ -75,12 +79,14 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(remoteMessage.getNotification().getBody()))
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setSmallIcon(R.drawable.very_small_fb_icon);
+                    .setSmallIcon(icon == 0? R.drawable.very_small_fb_icon: icon);
+
+
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
             notificationManager.notify(notificationId++, builder.build());
         } catch (Exception err) {
-            Log.e("AndroidCloudMessagingService", err.getMessage() + "");
+            Log.e("AndroidCloudMsg", err.getMessage() + "");
         }
     }
 
@@ -88,7 +94,7 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "AndroidCloudMessagingService";
             String description = "AndroidCloudMessagingService App";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(notificationChannel, name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
@@ -98,6 +104,10 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
         }
     }
 
+
+    private void setIcon(int resId) {
+        icon = resId;
+    }
 
     public void setOnMessageReceived(OnMessageReceived onMessageReceived) {
         this.onMessageReceived = onMessageReceived;
