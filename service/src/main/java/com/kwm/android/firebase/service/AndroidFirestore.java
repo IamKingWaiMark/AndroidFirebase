@@ -73,15 +73,15 @@ public class AndroidFirestore {
     /**
      * Listens to document reference.
      * @param name Name of the listener
-     * @param from String array containing path to the document. Collection > Document > Collection > Document > ...
+     * @param path String array containing path to the document. Collection > Document > Collection > Document > ...
      * @param iListenerToDocument A Listener to listen to the changes.
      */
-    public ListenerRegistration listenTo(@NonNull String name, String [] from, @NonNull final IListenerToDocument iListenerToDocument){
+    public ListenerRegistration listenTo(@NonNull String name, String [] path, @NonNull final IListenerToDocument iListenerToDocument){
         validateListenerName(name);
 
         listenerIndex.put(
                 name, // Name of this listener.
-                genDocumentReference(from).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                genDocumentReference(path).addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@NonNull DocumentSnapshot documentSnapshot, @NonNull FirebaseFirestoreException e) {
                         iListenerToDocument.onUpdate(documentSnapshot);
@@ -94,14 +94,14 @@ public class AndroidFirestore {
     /**
      * Listents the a collection reference.
      * @param name Name of the listener
-     * @param from String array containing path to the collection. Collection > Document > Collection > ...
+     * @param path String array containing path to the collection. Collection > Document > Collection > ...
      * @param where String array to build the query.
      * @param listenerToCollection A listener to listen to the changes.
      */
-    public ListenerRegistration listenTo(@NonNull String name, String [] from, Where [] where, @NonNull final IListenerToCollection listenerToCollection){
+    public ListenerRegistration listenTo(@NonNull String name, String [] path, Where [] where, @NonNull final IListenerToCollection listenerToCollection){
         validateListenerName(name);
 
-        CollectionReference cf = genCollectionReference(from);
+        CollectionReference cf = genCollectionReference(path);
         // Parameter.
         if(where != null && where.length > 0){
             Query query = null;
@@ -134,15 +134,15 @@ public class AndroidFirestore {
 
     }
 
-    /**
-     * Get a set of items from a collection.
-     * @param from
+    /*
+     * Get a set of items path a collection.
+     * @param path
      * @param where
      * @param getCollectionResult
-     */
-    public CompletableFuture<Task<QuerySnapshot>> get(String [] from, Where [] where, @NonNull final IGetCollectionResult getCollectionResult){
+
+    public CompletableFuture<Task<QuerySnapshot>> get(String [] path, Where [] where, @NonNull final IGetCollectionResult getCollectionResult){
         final CompletableFuture<Task<QuerySnapshot>> promise = new CompletableFuture<>();
-        CollectionReference cf = genCollectionReference(from);
+        CollectionReference cf = genCollectionReference(path);
 
         // Parameter.
         if(where != null && where.length > 0){
@@ -185,18 +185,58 @@ public class AndroidFirestore {
         }
 
         return promise;
-    }
+    }*/
 
-    /**
-     * Get a set of items from a collection.
-     * @param from
+    /*
+     * Get a set of items path a collection.
+     * @param path
      * @param where
-     */
-    public CompletableFuture<Task<QuerySnapshot>> get(String [] from, Where [] where){
-        return get(from, where, null);
+
+    public CompletableFuture<Task<QuerySnapshot>> get(String [] path, Where [] where){
+        return get(path, where, null);
+    }   */
+
+    public void get(String [] path, Where [] where, @NonNull final IGetCollectionResult getCollectionResult){
+        CollectionReference cf = genCollectionReference(path);
+        // Parameter.
+        if(where != null && where.length > 0){
+            Query query = null;
+            for(int i = 0; i < where.length; i++){
+                if(query == null) query = where[i].getQuery(cf);
+                else query = where[i].concatQuery(query);
+            }
+            query.get().addOnCompleteListener(
+                    new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                try{
+                                    getCollectionResult.result(task);
+                                } catch (Exception err) {}
+                            } else {
+                            }
+                        }
+                    }
+            );
+        } else {
+            cf.get().addOnCompleteListener(
+                    new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                try{
+                                    getCollectionResult.result(task);
+                                } catch (Exception err) {}
+                            } else {
+                            }
+                        }
+                    }
+            );
+        }
+
     }
-    public void get(String [] from, @NonNull final IGetDocumentResult getDocumentResult){
-        genDocumentReference(from).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+    public void get(String [] path, @NonNull final IGetDocumentResult getDocumentResult){
+        genDocumentReference(path).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 getDocumentResult.result(task);
@@ -205,44 +245,44 @@ public class AndroidFirestore {
     }
 
     /**
-     * Generate a document reference from a path to the database.
-     * @param from
+     * Generate a document reference path a path to the database.
+     * @param path
      * @return
      */
-    private DocumentReference genDocumentReference(String [] from){
+    private DocumentReference genDocumentReference(String [] path){
         // Check if path is referencing a document.
-        checkDocumentPathValidity(from);
+        checkDocumentPathValidity(path);
         // Generate reference.
         FirebaseFirestore db = getInstance();
         CollectionReference cf = null;
         DocumentReference df = null;
-        for(int i = 0; i < from.length; i++){
+        for(int i = 0; i < path.length; i++){
             // 0 is document, 1 is collection
             if(i % 2 == 0){
-                if(cf == null) cf = db.collection(from[i]);
-                else cf = df.collection(from[i]);
+                if(cf == null) cf = db.collection(path[i]);
+                else cf = df.collection(path[i]);
             } else {
-                df = cf.document(from[i]);
+                df = cf.document(path[i]);
             }
         }
         return df;
     }
 
-    private CollectionReference genCollectionReference(String [] from) {
+    private CollectionReference genCollectionReference(String [] path) {
         // Check if the path is referencing a collection.
-        checkCollectionPathValidity(from);
+        checkCollectionPathValidity(path);
 
         FirebaseFirestore db = getInstance();
         CollectionReference cf = null;
         DocumentReference df = null;
 
-        for(int i = 0; i < from.length; i++){
+        for(int i = 0; i < path.length; i++){
             // 0 is document, 1 is collection
             if(i % 2 == 0){
-                if(cf == null) cf = db.collection(from[i]);
-                else cf = df.collection(from[i]);
+                if(cf == null) cf = db.collection(path[i]);
+                else cf = df.collection(path[i]);
             } else {
-                df = cf.document(from[i]);
+                df = cf.document(path[i]);
             }
         }
 
@@ -250,36 +290,36 @@ public class AndroidFirestore {
     }
     /**
      * Check if the path to the collection is valid.
-     * @param from
+     * @param path
      */
-    private void checkCollectionPathValidity(String [] from){
-        if(from == null || !isCollectionPath(from)) throw new RuntimeException(this.getClass().getName() + " Not a valid path to a collection");
+    private void checkCollectionPathValidity(String [] path){
+        if(path == null || !isCollectionPath(path)) throw new RuntimeException(this.getClass().getName() + " Not a valid path to a collection");
     }
 
     /**
      * Check to see if the path is a collection collection.
-     * @param from
+     * @param path
      * @return
      */
-    private boolean isCollectionPath(String [] from){
-        return from.length % 2 == 1;
+    private boolean isCollectionPath(String [] path){
+        return path.length % 2 == 1;
     }
 
     /**
      * Checks if the path to the document is valid.
-     * @param from
+     * @param path
      */
-    private void checkDocumentPathValidity(String [] from){
-        if(from == null || !isDocumentPath(from)) throw new RuntimeException(this.getClass().getName() + " Not a valid path to a document");
+    private void checkDocumentPathValidity(String [] path){
+        if(path == null || !isDocumentPath(path)) throw new RuntimeException(this.getClass().getName() + " Not a valid path to a document");
     }
 
     /**
      * Check to see if the path is a document reference.
-     * @param from
+     * @param path
      * @return
      */
-    private boolean isDocumentPath(String [] from){
-        return from.length % 2 == 0;
+    private boolean isDocumentPath(String [] path){
+        return path.length % 2 == 0;
     }
     public FirebaseFirestore getInstance(){
         return FirebaseFirestore.getInstance();
