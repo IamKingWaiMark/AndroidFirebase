@@ -85,6 +85,7 @@ public class AndroidFireAuth {
     }
 
     public void sendVerificationEmail(){
+
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if(auth.getCurrentUser() == null) {
             Log.e("VerificaitonEmail", "No user detected");
@@ -94,10 +95,7 @@ public class AndroidFireAuth {
     }
 
     public void sendPasswordResetEmail(String email, final AuthStatusListener authStatusListener){
-        if(getUser() == null) {
-            Log.d("SendPasswordReset", "No user detected");
-            return;
-        }
+
         getAuth().sendPasswordResetEmail(email).addOnSuccessListener(
                 new OnSuccessListener<Void>() {
                     @Override
