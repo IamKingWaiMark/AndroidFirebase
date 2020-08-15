@@ -25,6 +25,8 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
     private OnMessageReceived onMessageReceived;
     private int notificationId = 0;
     private int icon = 0;
+    private int priority = NotificationCompat.PRIORITY_DEFAULT;
+
 
     public AndroidCloudMessagingService(){
         super();
@@ -78,7 +80,7 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
                     .setContentText(remoteMessage.getNotification().getBody())
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .bigText(remoteMessage.getNotification().getBody()))
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setPriority(priority)
                     .setSmallIcon(icon == 0? R.drawable.very_small_fb_icon: icon);
 
 
@@ -89,6 +91,11 @@ public class AndroidCloudMessagingService extends FirebaseMessagingService {
             Log.e("AndroidCloudMsg", err.getMessage() + "");
         }
     }
+
+    public void enableHeadsUpNotification(){
+        priority = NotificationCompat.PRIORITY_HIGH;
+    }
+
 
     private void createNotificationChannel(String notificationChannel) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
