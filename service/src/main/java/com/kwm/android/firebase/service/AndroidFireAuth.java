@@ -1,6 +1,6 @@
 package com.kwm.android.firebase.service;
 
-import android.net.Uri;
+import android.app.Activity;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -8,6 +8,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.OAuthProvider;
+import com.kwm.android.firebase.service.interfaces.LoginProvider;
 
 import androidx.annotation.NonNull;
 
@@ -157,6 +159,28 @@ public class AndroidFireAuth {
         void whenSignedInAndEmailVerified(FirebaseUser user);
     }
 
+
+
+
+    public void signInWithProviders(Activity activity, LoginProvider loginProvider, final AuthStatusListener authStatusListener) {
+        OAuthProvider.Builder provider = OAuthProvider.newBuilder(loginProvider.getProviderString());
+        getAuth().startActivityForSignInWithProvider(activity, provider.build())
+        .addOnSuccessListener(
+                new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        authStatusListener.onSuccess(authResult);
+                    }
+                }
+        ).addOnFailureListener(
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        authStatusListener.onFailure(e.getMessage());
+                    }
+                }
+        );
+    }
 
 
 }
