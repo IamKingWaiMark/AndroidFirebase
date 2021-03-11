@@ -32,9 +32,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     // Firebase Libs
     // Import the BoM for the Firebase platform
+
+
     api platform('com.google.firebase:firebase-bom:26.6.0')
     api 'com.google.firebase:firebase-analytics'
-    api 'com.google.firebase:firebase-auth'
+    api 'com.google.firebase:firebase-auth:19.2.0'
     api 'com.google.firebase:firebase-firestore'
     api 'com.google.firebase:firebase-messaging'
     api 'com.google.firebase:firebase-inappmessaging'
