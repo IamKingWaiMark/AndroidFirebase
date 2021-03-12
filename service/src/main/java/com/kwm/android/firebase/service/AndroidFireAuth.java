@@ -67,20 +67,20 @@ public class AndroidFireAuth {
                     @Override
                     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                        try{
+                            authState.whenChanged(firebaseUser);
+                        } catch (Exception err) {}
                         if(firebaseUser != null) {
-                            try{
-                                authState.whenSignedIn(firebaseUser);
-                                if(firebaseUser.isEmailVerified()) {
-                                    authState.whenSignedInAndEmailVerified(firebaseUser);
-                                } else {
-                                    authState.whenSignedInAndEmailNotVerified(firebaseUser);
-                                }
-                            } catch (Exception err) {}
-                        } else if (firebaseUser == null) {
-                            authState.whenSignedOut();
+                            try {authState.whenSignedIn(firebaseUser);} catch (Exception err) {}
+                            if(firebaseUser.isEmailVerified()) {
+                                try { authState.whenSignedInAndEmailVerified(firebaseUser); } catch (Exception err) {}
+                            } else {
+                                try { authState.whenSignedInAndEmailNotVerified(firebaseUser); } catch (Exception err) {}
+                            }
+                        } else {
+                            try { authState.whenSignedOut(); } catch (Exception err) {}
                         }
 
-                        authState.whenChanged(firebaseUser);
                     }
                 }
         );
