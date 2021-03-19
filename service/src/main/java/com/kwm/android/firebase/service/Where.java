@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
             LESS_THAN_EQUAL_TO,
             CONTAINS,
             LIMIT,
-            ORDER_BT
+            ORDER_BY
         }
 
         public enum Direction {
