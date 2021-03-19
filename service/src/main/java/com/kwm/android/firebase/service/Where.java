@@ -41,7 +41,7 @@ import androidx.annotation.NonNull;
             this.limit = limit;
         }
         public Where(@NonNull Condition condition, @NonNull String orderBy, @NonNull Direction direction){
-            if(condition != Condition.ORDER_BT) throw new RuntimeException("Attempted to use ORDER_BY where query but ORDER_BY is not found.");
+            if(condition != Condition.ORDER_BY) throw new RuntimeException("Attempted to use ORDER_BY where query but ORDER_BY is not found.");
             this.condition = condition;
             this.orderBy = orderBy;
             this.direction = direction;
@@ -63,7 +63,7 @@ import androidx.annotation.NonNull;
                     return query.whereArrayContains(where, argument);
                 case LIMIT:
                     return query.limit(limit);
-                case ORDER_BT:
+                case ORDER_BY:
                     return query.orderBy(orderBy, genOrderDirection());
             }
 
@@ -86,7 +86,7 @@ import androidx.annotation.NonNull;
                     return collectionReference.whereArrayContains(where, argument);
                 case LIMIT:
                     return collectionReference.limit(limit);
-                case ORDER_BT:
+                case ORDER_BY:
                     return collectionReference.orderBy(orderBy, genOrderDirection());
             }
             return null;
