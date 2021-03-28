@@ -3,6 +3,7 @@ package com.kwm.android.firebase.service;
 
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -18,6 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
+import com.kwm.android.firebase.service.interfaces.IBatchComplete;
 import com.kwm.android.firebase.service.interfaces.IGetCollectionResult;
 import com.kwm.android.firebase.service.interfaces.IGetDocumentResult;
 import com.kwm.android.firebase.service.interfaces.IListenerToCollection;
@@ -43,7 +46,36 @@ public class AndroidFirestore {
         } else if(isDocumentPath(ref)){
             genDocumentReference(ref).set(data).addOnCompleteListener(onCompleteListener);
         }
+    }
 
+    public void all(List<BatchOperation> batchOperations, final IBatchComplete batchComplete){
+        FirebaseFirestore db = getInstance();
+        WriteBatch writeBatch = db.batch();
+        for(BatchOperation bo : batchOperations) {
+            switch (bo.getType()) {
+                case DELETE:
+                    writeBatch.delete(genDocumentReference(bo.getPath()));
+                    break;
+                case UPDATE:
+                    writeBatch.update(genDocumentReference(bo.getPath()), bo.getData());
+                    break;
+                case CREATE:
+                    writeBatch.set(genDocumentReference(bo.getPath()), bo.getData());
+                    break;
+            }
+        }
+        writeBatch.commit().addOnCompleteListener(
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()) {
+                            batchComplete.onSuccess();
+                        } else {
+                            batchComplete.onFail();
+                        }
+                    }
+                }
+        );
     }
 
     /**
