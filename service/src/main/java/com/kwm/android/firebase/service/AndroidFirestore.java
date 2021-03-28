@@ -14,6 +14,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -39,7 +40,7 @@ public class AndroidFirestore {
      * Adds an document to a collection.
      * @param ref
      */
-    public void create(String [] ref, Object data, @NonNull OnCompleteListener<Void> onCompleteListener){
+    public void create(String [] ref, Object data, @NonNull OnCompleteListener<Void> onCompleteListener) {
         if(data == null) throw new RuntimeException("Error creating data. Data is null.");
         if(isCollectionPath(ref)) {
             genCollectionReference(ref).document().set(data).addOnCompleteListener(onCompleteListener);
@@ -48,6 +49,17 @@ public class AndroidFirestore {
         }
     }
 
+    public FieldValue increment(long value){
+        return FieldValue.increment(value);
+    }
+    public FieldValue increment(double value){
+        return FieldValue.increment(value);
+    }
+    /**
+     * Executes multiple operations
+     * @param batchOperations
+     * @param batchComplete
+     */
     public void all(List<BatchOperation> batchOperations, final IBatchComplete batchComplete){
         FirebaseFirestore db = getInstance();
         WriteBatch writeBatch = db.batch();
