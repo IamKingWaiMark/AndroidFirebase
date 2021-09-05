@@ -40,5 +40,4 @@ dependencies {
     api 'com.google.firebase:firebase-inappmessaging'
     api 'com.google.firebase:firebase-inappmessaging-display'
     api 'com.google.firebase:firebase-storage'
-    api 'com.google.android.gms:play-services-ads'
 }
