@@ -31,7 +31,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     // Firebase Libs
-    api platform('com.google.firebase:firebase-bom:28.4.0')
+    implementation platform('com.google.firebase:firebase-bom:28.4.0')
     api 'com.google.firebase:firebase-core'
     api 'com.google.firebase:firebase-analytics'
     api 'com.google.firebase:firebase-auth'
