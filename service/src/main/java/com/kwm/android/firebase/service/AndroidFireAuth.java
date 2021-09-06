@@ -165,6 +165,7 @@ public class AndroidFireAuth {
 
     public void signInWithProviders(Activity activity, LoginProvider loginProvider, final AuthStatusListener authStatusListener) {
         OAuthProvider.Builder provider = OAuthProvider.newBuilder(loginProvider.getProviderString());
+
         getAuth().startActivityForSignInWithProvider(activity, provider.build())
         .addOnSuccessListener(
                 new OnSuccessListener<AuthResult>() {
