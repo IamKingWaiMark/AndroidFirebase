@@ -165,23 +165,43 @@ public class AndroidFireAuth {
 
     public void signInWithProviders(Activity activity, LoginProvider loginProvider, final AuthStatusListener authStatusListener) {
         OAuthProvider.Builder provider = OAuthProvider.newBuilder(loginProvider.getProviderString());
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        Task<AuthResult> pendingResultTask = firebaseAuth.getPendingAuthResult();
+        if (pendingResultTask != null) {
+            pendingResultTask
+                    .addOnSuccessListener(
+                            new OnSuccessListener<AuthResult>() {
+                                @Override
+                                public void onSuccess(AuthResult authResult) {
+                                    authStatusListener.onSuccess(authResult);
+                                }
+                            })
+                    .addOnFailureListener(
+                            new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    authStatusListener.onFailure(e.getMessage());
+                                }
+                            });
+        } else {
+            getAuth().startActivityForSignInWithProvider(activity, provider.build())
+                    .addOnSuccessListener(
+                            new OnSuccessListener<AuthResult>() {
+                                @Override
+                                public void onSuccess(AuthResult authResult) {
+                                    authStatusListener.onSuccess(authResult);
+                                }
+                            }
+                    ).addOnFailureListener(
+                    new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            authStatusListener.onFailure(e.getMessage());
+                        }
+                    }
+            );
+        }
 
-        getAuth().startActivityForSignInWithProvider(activity, provider.build())
-        .addOnSuccessListener(
-                new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult authResult) {
-                        authStatusListener.onSuccess(authResult);
-                    }
-                }
-        ).addOnFailureListener(
-                new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        authStatusListener.onFailure(e.getMessage());
-                    }
-                }
-        );
     }
 
 
