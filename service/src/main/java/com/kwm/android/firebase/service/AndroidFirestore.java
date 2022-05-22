@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Source;
 import com.google.firebase.firestore.WriteBatch;
 import com.kwm.android.firebase.service.interfaces.IBatchComplete;
 import com.kwm.android.firebase.service.interfaces.IGetCollectionResult;
@@ -279,8 +280,57 @@ public class AndroidFirestore {
         }
 
     }
+    public void get(@NonNull Source source, String [] path, Where [] where, @NonNull final IGetCollectionResult getCollectionResult){
+        CollectionReference cf = genCollectionReference(path);
+        // Parameter.
+        if(where != null && where.length > 0){
+            Query query = null;
+            for(int i = 0; i < where.length; i++){
+                if(query == null) query = where[i].getQuery(cf);
+                else query = where[i].concatQuery(query);
+            }
+            query.get(source).addOnCompleteListener(
+                    new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                try{
+                                    getCollectionResult.result(task);
+                                } catch (Exception err) {}
+                            } else {
+                            }
+                        }
+                    }
+            );
+        } else {
+            cf.get(source).addOnCompleteListener(
+                    new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                try{
+                                    getCollectionResult.result(task);
+                                } catch (Exception err) {}
+                            } else {
+                            }
+                        }
+                    }
+            );
+        }
+
+    }
     public void get(String [] path, @NonNull final IGetDocumentResult getDocumentResult){
         genDocumentReference(path).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                getDocumentResult.result(task);
+            }
+        });
+    }
+
+
+    public void get(Source source, String [] path, @NonNull final IGetDocumentResult getDocumentResult){
+        genDocumentReference(path).get(source).addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 getDocumentResult.result(task);
