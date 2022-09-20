@@ -5,7 +5,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class AndroidFireStorage {
 
-    private StorageReference getReference(String path) {
+    public StorageReference getReference(String path) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         if(path == null) {
             return storage.getReference();
